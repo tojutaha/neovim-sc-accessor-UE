@@ -85,13 +85,13 @@ bool FNeovimAccessor::OpenSolutionAtPath(const FString& SolutionPath)
     const FString Params = FString::Printf(TEXT("\"%s\""), *Path);
 
     // TODO: We should check if there is already a Neovim instance running and use that instead of launching a new one.
-    return RunNeovim([this, &Params, &Path]() -> bool
+    return RunNeovim([this, &Params]() -> bool
     {
         FProcHandle Proc = FPlatformProcess::CreateProc(*NeovimPath, *Params, true, false, false, nullptr, 0, nullptr, nullptr);
         const bool Success = Proc.IsValid();
         if (!Success)
         {
-            UE_LOG(LogNeovimAccessor, Error, TEXT("Failed to launch Neovim with %s, in project file %s."), *Params, *Path);
+            UE_LOG(LogNeovimAccessor, Error, TEXT("Failed to launch Neovim with %s params"), *Params);
             FPlatformProcess::CloseProc(Proc);
             return Success;
         }
@@ -125,13 +125,13 @@ bool FNeovimAccessor::OpenFileAtLine(const FString& FullPath, int32 LineNumber, 
     const FString Params = FString::Printf(TEXT("+%d %s"), LineNumber, *Path);
 
     // TODO: We should check if there is already a Neovim instance running and use that instead of launching a new one.
-    return RunNeovim([this, &Params, &Path]() -> bool
+    return RunNeovim([this, &Params]() -> bool
     {
         FProcHandle Proc = FPlatformProcess::CreateProc(*NeovimPath, *Params, true, false, false, nullptr, 0, nullptr, nullptr);
         const bool Success = Proc.IsValid();
         if (!Success)
         {
-            UE_LOG(LogNeovimAccessor, Error, TEXT("Failed to launch Neovim with %s, in project file %s."), *Params, *Path);
+            UE_LOG(LogNeovimAccessor, Error, TEXT("Failed to launch Neovim with %s params"), *Params);
             FPlatformProcess::CloseProc(Proc);
             return Success;
         }
@@ -146,23 +146,27 @@ bool FNeovimAccessor::OpenSourceFiles(const TArray<FString>& AbsoluteSourcePaths
         return false;
     }
 
+#if 0
     FString SolutionPath = FPaths::GetProjectFilePath();
     FString SourceLocations = "";
     for (const FString& SourcePath : AbsoluteSourcePaths)
     {
-        SourceLocations += FString::Printf(TEXT("\"%s\" %s"), *SolutionPath, *SourceLocations);
+        SourceLocations += FString::Printf(TEXT("\"%s\" "), *SourcePath);
     }
+#endif
 
-    const FString Params = FString::Printf(TEXT("\"%s\" %s"), *SolutionPath, *SourceLocations);
+    // 0 is header, 1 source
+    //const FString Params = FString::Printf(TEXT("\"%s\" %s"), *SolutionPath, *SourceLocations);
+    const FString Params = AbsoluteSourcePaths[0];
 
     // TODO: We should check if there is already a Neovim instance running and use that instead of launching a new one.
-    return RunNeovim([this, &Params, &SourceLocations]() -> bool
+    return RunNeovim([this, &Params]() -> bool
     {
         FProcHandle Proc = FPlatformProcess::CreateProc(*NeovimPath, *Params, true, false, false, nullptr, 0, nullptr, nullptr);
         const bool Success = Proc.IsValid();
         if (!Success)
         {
-            UE_LOG(LogNeovimAccessor, Error, TEXT("Failed to launch Neovim with %s, in project file %s."), *Params, *SourceLocations);
+            UE_LOG(LogNeovimAccessor, Error, TEXT("Failed to launch Neovim with %s params"), *Params);
             FPlatformProcess::CloseProc(Proc);
             return Success;
         }
