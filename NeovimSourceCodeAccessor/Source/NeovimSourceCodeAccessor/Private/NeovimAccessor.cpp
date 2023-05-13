@@ -93,7 +93,6 @@ bool FNeovimAccessor::OpenSolutionAtPath(const FString& SolutionPath)
         {
             UE_LOG(LogNeovimAccessor, Error, TEXT("Failed to launch Neovim with %s params"), *Params);
             FPlatformProcess::CloseProc(Proc);
-            return Success;
         }
         return Success;
     });
@@ -133,7 +132,6 @@ bool FNeovimAccessor::OpenFileAtLine(const FString& FullPath, int32 LineNumber, 
         {
             UE_LOG(LogNeovimAccessor, Error, TEXT("Failed to launch Neovim with %s params"), *Params);
             FPlatformProcess::CloseProc(Proc);
-            return Success;
         }
         return Success;
     });
@@ -146,17 +144,7 @@ bool FNeovimAccessor::OpenSourceFiles(const TArray<FString>& AbsoluteSourcePaths
         return false;
     }
 
-#if 0
-    FString SolutionPath = FPaths::GetProjectFilePath();
-    FString SourceLocations = "";
-    for (const FString& SourcePath : AbsoluteSourcePaths)
-    {
-        SourceLocations += FString::Printf(TEXT("\"%s\" "), *SourcePath);
-    }
-#endif
-
     // 0 is header, 1 source
-    //const FString Params = FString::Printf(TEXT("\"%s\" %s"), *SolutionPath, *SourceLocations);
     const FString Params = AbsoluteSourcePaths[0];
 
     // TODO: We should check if there is already a Neovim instance running and use that instead of launching a new one.
@@ -168,7 +156,6 @@ bool FNeovimAccessor::OpenSourceFiles(const TArray<FString>& AbsoluteSourcePaths
         {
             UE_LOG(LogNeovimAccessor, Error, TEXT("Failed to launch Neovim with %s params"), *Params);
             FPlatformProcess::CloseProc(Proc);
-            return Success;
         }
         return Success;
     });
